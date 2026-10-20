@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const PORT = process.env.PORT || 3000;
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 const rooms = new Map();
 const ZONES = ["deck", "hand", "mana", "shield", "battle", "graveyard"];
