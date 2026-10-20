@@ -79,5 +79,42 @@
   </main>
   <script src="/socket.io/socket.io.js"></script>
   <script src="app.js"></script>
+<section id="deck-import" style="margin:20px auto;padding:16px;max-width:600px;border:1px solid #888;border-radius:12px;">
+  <h2>🃏 デッキシート読み込み</h2>
+  <p>デュエル・マスターズ公式サポートアプリのPDFからコピーしたカード名を貼り付けてね。</p>
+  <textarea id="deck-import-text" rows="8" placeholder="カード名を1行ずつ貼り付け"></textarea>
+  <button id="deck-import-button" type="button">カードをまとめる</button>
+  <p id="deck-import-status">カード名を貼り付けてね。</p>
+  <ul id="deck-import-result"></ul>
+</section>
+
+<script>
+document.getElementById("deck-import-button").addEventListener("click", function () {
+  const text = document.getElementById("deck-import-text").value.trim();
+  const result = document.getElementById("deck-import-result");
+  const status = document.getElementById("deck-import-status");
+  result.replaceChildren();
+
+  if (!text) {
+    status.textContent = "先にカード名を貼り付けてね。";
+    return;
+  }
+
+  const counts = new Map();
+  text.split(/\r?\n/).map(name => name.trim()).filter(Boolean).forEach(name => {
+    counts.set(name, (counts.get(name) || 0) + 1);
+  });
+
+  let total = 0;
+  counts.forEach((count, name) => {
+    total += count;
+    const item = document.createElement("li");
+    item.textContent = name + " × " + count;
+    result.appendChild(item);
+  });
+
+  status.textContent = "合計 " + total + " 枚（異なるカード名 " + counts.size + " 種類）";
+});
+</script>
 </body>
 </html>
