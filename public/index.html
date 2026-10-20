@@ -93,28 +93,63 @@ document.getElementById("deck-import-button").addEventListener("click", function
   const text = document.getElementById("deck-import-text").value.trim();
   const result = document.getElementById("deck-import-result");
   const status = document.getElementById("deck-import-status");
+
   result.replaceChildren();
 
   if (!text) {
     status.textContent = "先にカード名を貼り付けてね。";
+    status.style.color = "#ff3333";
     return;
   }
 
   const counts = new Map();
-  text.split(/\r?\n/).map(name => name.trim()).filter(Boolean).forEach(name => {
-    counts.set(name, (counts.get(name) || 0) + 1);
-  });
 
-  let total = 0;
-  counts.forEach((count, name) => {
-    total += count;
-    const item = document.createElement("li");
-    item.textContent = name + " × " + count;
-    result.appendChild(item);
-  });
+  text.split(/\r?\n/)
+    .map(name => name.trim())
+    .filter(Boolean)
+    .forEach(name => {
+      counts.set(name, (counts.get(name) || 0) + 1);
+    });
 
-  status.textContent = "現在" + total + "枚です";
-status.style.color = total === 40 ? "#ffffff" : "#ff3333";
+  function updateDeck() {
+    result.replaceChildren();
+
+    let total = 0;
+
+    counts.forEach((count, name) => {
+      total += count;
+
+      const item = document.createElement("li");
+      const nameText = document.createElement("span");
+      nameText.textContent = name + " × " + count + " ";
+
+      const minus = document.createElement("button");
+      minus.textContent = "−";
+      minus.type = "button";
+      minus.addEventListener("click", function () {
+        if (count > 0) {
+          counts.set(name, count - 1);
+          updateDeck();
+        }
+      });
+
+      const plus = document.createElement("button");
+      plus.textContent = "＋";
+      plus.type = "button";
+      plus.addEventListener("click", function () {
+        counts.set(name, count + 1);
+        updateDeck();
+      });
+
+      item.append(nameText, minus, plus);
+      result.appendChild(item);
+    });
+
+    status.textContent = "現在" + total + "枚です";
+    status.style.color = total === 40 ? "#ffffff" : "#ff3333";
+  }
+
+  updateDeck();
 });
 </script>
 </body>
